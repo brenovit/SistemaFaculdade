@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.qst1.vo.Aluno;
 import com.qst1.vo.Disciplina;
+import com.recursos.AlunosTable;
 import com.recursos.InOut;
 
 public class AlunoDAO implements DAO {
@@ -23,8 +26,8 @@ public class AlunoDAO implements DAO {
 	private List<Disciplina> listaDisciplina;
 	private String msg = "";
 	private Connection connection = null;		//manager the connection
-	private Statement statement = null;			//manager the database, doing the query
 	private ResultSet result = null;			//return data from database
+	private PreparedStatement pst =null;
 	
 	public AlunoDAO(){
 		super();
@@ -39,7 +42,8 @@ public class AlunoDAO implements DAO {
 		return listaAluno;
 	}
 	
-	public void Connect() {
+	//verificar se tem que abrir e fechar o banco a cada uso ou abrir uma vez e fecha só no final
+	public Connection Connect() {
 		// TODO Conectar no banco
 		String URL = "jdbc:mysql://localhost:3306/faculdade";	//URL where the database is
 		String user = "root";								//main user
@@ -48,9 +52,10 @@ public class AlunoDAO implements DAO {
 		try{
 			Class.forName(driver);											//Registering the controller
 			this.connection = DriverManager.getConnection(URL,user,pass);	//Establishing connection whith the database
-			this.statement = this.connection.createStatement();				//Making the query use struct
+			return connection;
 		}catch(Exception e){
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - CONNECT", 0);
+			return null;
 		}
 	}
 
@@ -66,8 +71,14 @@ public class AlunoDAO implements DAO {
 	public void Create(Object o) {
 		Aluno object = (Aluno) o;
 		try{
-			String query = "INSERT INTO alunos (nome,cpf) VALUES ('" + object.getNome() + "', '" + object.getCPF() + "');";
-			this.statement.executeUpdate(query);
+			//String query = "INSERT INTO alunos (nome,cpf) VALUES ('" + object.getNome() + "', '" + object.getCPF() + "')";
+			String sql = "INSERT INTO alunos (nome,cpf) VALUES (?,?)";
+			pst = Connect().prepareStatement(sql);
+			pst.setString(1, object.getNome());
+			pst.setString(2, object.getCPF());
+			//this.statement.executeUpdate(query);
+			pst.executeUpdate();
+			Disconnect();
 		}catch(Exception e){
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - INSERT", 1);
 		}
@@ -117,9 +128,14 @@ public class AlunoDAO implements DAO {
 	@Override
 	public void Update(Object o) {
 		Aluno object = (Aluno) o;
-		try{
-			String query = "UPDATE alunos SET nome = '"+object.getNome()+"', cpf = '"+object.getCPF()+"' WHERE id = '"+object.getMatricula()+"';";
-			this.statement.executeUpdate(query);
+		try{			
+			String sql = "UPDATE alunos SET nome = ?, cpf = ? WHERE id = ?";
+			pst = Connect().prepareStatement(sql);
+			pst.setString(1, object.getNome());
+			pst.setString(2, object.getCPF());
+			pst.setString(3, object.getMatricula().toString());
+			pst.executeUpdate();
+			Disconnect();
 		}catch(Exception e){
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - UPDATE", 1);
 		}
@@ -135,8 +151,11 @@ public class AlunoDAO implements DAO {
 	public boolean Delete(Object o) {
 		Aluno object = (Aluno) o;
 		try{
-			String query = "DELETE FROM alunos WHERE id = '"+object.getMatricula()+"';";
-			this.statement.executeUpdate(query);
+			String sql = "DELETE FROM alunos WHERE id = ?";
+			pst = Connect().prepareStatement(sql);
+			pst.setString(1, object.getMatricula().toString());
+			pst.executeUpdate();
+			Disconnect();
 			return true;
 		}catch(Exception e){
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - DELETE", 1);
@@ -149,7 +168,7 @@ public class AlunoDAO implements DAO {
 	    }
 	    return false;
 	}
-	
+		
 	public String ShowDisciplinasMatriculadas(Aluno aluno) {
 		msg = "";
 		int pos = Find(aluno,false);
@@ -212,6 +231,26 @@ public class AlunoDAO implements DAO {
 			this.connection.close();
 		}catch(Exception e){
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - DISCONNECT", 0);
+		}
+	}
+	
+	public void ReadDataBase(){
+		try {
+			String sql = "SELECT id, nome, cpf FROM alunos";
+			pst = Connect().prepareStatement(sql);
+			ResultSet rs = pst.executeQuery(sql);
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int colNo = rsmd.getColumnCount();
+			while(rs.next()){
+				Integer matricula = Integer.parseInt(rs.getString(1));
+				String  nome = rs.getString(2);
+				String cpf = rs.getString(3);
+				Aluno aluno = new Aluno(nome, matricula, cpf);
+				Aluno.setGerador(matricula);
+				listaAluno.add(aluno);
+			}
+		} catch (Exception e) {
+			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - UPDATE", 1);
 		}
 	}
 }

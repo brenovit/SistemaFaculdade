@@ -29,11 +29,7 @@ public class AlunosTable extends AbstractTableModel{
 		});		
 	}
 	
-	public void addRow(Aluno o){
-		this.dados.add(o);
-		this.fireTableDataChanged();
-	}
-	
+	@Override
 	public String getColumnName(int num){
 		return this.columns[num];
 	}
@@ -54,6 +50,7 @@ public class AlunosTable extends AbstractTableModel{
 			return true;
 		return false;
 	}
+	
 	@Override
 	public Object getValueAt(int row, int column) {					//return a value in a row
 		// TODO Auto-generated method stub
@@ -64,6 +61,7 @@ public class AlunosTable extends AbstractTableModel{
 			default:		throw new IndexOutOfBoundsException("Invalid Column");
 		}
 	}
+	
 	@Override
 	public void setValueAt(Object value, int row, int column){		//set 
 			if(value == null)	return;
@@ -73,12 +71,70 @@ public class AlunosTable extends AbstractTableModel{
 			}
 	}
 	
+	public Class<?> getColumnClass(int column) {
+		switch(column){
+			case MATRICULA: return int.class;
+			case NOME: 		return String.class;
+			case CPF: 		return String.class;
+			default:		throw new IndexOutOfBoundsException("Invalid Column");
+		}
+	}
+	
+	/**
+	 * adiciona uma linha na tabela
+	 * @param o
+	 */
+	public void addRow(Aluno o){
+		this.dados.add(o);
+		this.fireTableDataChanged();
+		//this.fireTableRowsInserted(indexOf(o), indexOf(o));
+	}
+	
+	/**
+	 * preenche toda a tabela com uma lista
+	 * @param dataIn
+	 */
+	public void addRowAll(List<Aluno> dataIn){
+		dados.addAll(dataIn);
+		this.fireTableDataChanged();
+	}
+
+	/**
+	 * remove uma linha da coluna
+	 * @param row(linha)
+	 */
 	public void removeRow(int row){
 		this.dados.remove(row);
 		this.fireTableDataChanged();
+		//this.fireTableRowsDeleted(row, row);
 	}
 	
-	public Aluno get(int row){
+	/**
+	 * Limpa toda a tabela
+	 */
+	public void removeAll(){
+		dados.clear();
+		this.fireTableDataChanged();
+	}
+	
+	/**
+	 * retornar o aluno de uma linha especifica
+	 * @param row(linha) 
+	 * @return
+	 */
+	public Aluno getValue(int row){
 		return this.dados.get(row);
+	}
+	
+	public int indexOf(Aluno o){
+		return dados.indexOf(o);
+	}
+	/**
+	 * Substitui todos os valores da tabela
+	 * @param lista
+	 */
+	public void setValue(List<Aluno> lista){
+		dados = lista;
+		this.fireTableDataChanged();
 	}
 }

@@ -71,7 +71,7 @@ public class Aluno {
 		geradorMatricula = 0;
 	}
 	
-	public void setGerador(int matricula){
+	public static void setGerador(int matricula){
 		geradorMatricula = matricula;
 	}
 	

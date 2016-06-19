@@ -34,7 +34,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class InternalFrameCadastroAluno extends JInternalFrame {
-	private 	AlunoDAO	listaAluno = ManipulaDados.getListaAluno();
 	
 	protected	static	JTextField 	txtPesquisa;
 	protected	static	JTextField 	txtMatricula;
@@ -323,7 +322,7 @@ public class InternalFrameCadastroAluno extends JInternalFrame {
 		}
 		txtMatricula.setText((Aluno.getGerador()+1)+"");
 		FrmPrincipal.setTableEnable(true);
-		FrmPrincipal.AttLista();
+		FrmPrincipal.PreencherTabela();
 		AtivarBotoes(false);
 		AtivarCampos(false);
 		LimparCampos();

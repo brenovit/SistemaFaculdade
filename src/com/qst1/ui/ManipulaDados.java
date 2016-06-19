@@ -16,20 +16,14 @@ public class ManipulaDados{
 	private static SaveLoadFile SaveLoad = new SaveLoadFile();
 	
 	protected static void CadastrarAluno(Aluno aluno){
-		if(dataAluno.isConnected())
-			dataAluno.Create(aluno);
+		dataAluno.Create(aluno);
 	}
 	
 	protected static void AtualizarAluno(Aluno aluno){
-		aluno.setCPF(aluno.getCPF());
-		aluno.setNome(aluno.getNome());
-		aluno.setMatricula(aluno.getMatricula());
-		if(dataAluno.isConnected())
-			dataAluno.Update(aluno);
+		dataAluno.Update(aluno);
 	}
 	
 	protected static void RemoverAluno(Aluno aluno){
-		aluno.setMatricula(aluno.getMatricula());
 		dataAluno.Delete(aluno);
 	}
 	
@@ -42,11 +36,7 @@ public class ManipulaDados{
 	}
 	
 	protected static boolean PesquisarAluno(Aluno aluno){
-		aluno.setMatricula(aluno.getMatricula());
 		if(dataAluno.Find(aluno,true) != -1){
-			aluno.setNome(aluno.getNome());
-			aluno.setCPF(aluno.getCPF());
-			aluno.setMatricula(aluno.getMatricula());
 			return true;
 		}
 		return false;
@@ -103,8 +93,12 @@ public class ManipulaDados{
 		grade.CadastrarDisciplina(disc);
 	}
 	
-	protected static AlunoDAO getListaAluno(){
+	protected static AlunoDAO getAlunoDAO(){
 		return dataAluno;
+	}
+	
+	protected static List<Aluno> getListAluno(){
+		return dataAluno.getLista();
 	}
 	
 	protected static GradeEscolar getGradeEscolar(){
@@ -133,7 +127,7 @@ public class ManipulaDados{
 	//detalhe de um metodo
 	 /**
      * Limpa a lista de Alunos	
-     * @param rowIndex
+     * @param
      * @return
      */
 	protected static void LimparLista(){
@@ -149,5 +143,13 @@ public class ManipulaDados{
 	
 	protected static void Desconectar(){
 		dataAluno.Disconnect();
+	}
+	
+	protected static boolean isEmpty(){
+		return false;		
+	}
+	
+	protected static void LerBanco(){
+		dataAluno.ReadDataBase();
 	}
 }

@@ -6,15 +6,12 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.DefaultTableModel;
 
 import com.qst1.dao.AlunoDAO;
-import com.qst1.dao.GradeEscolar;
 import com.qst1.persistencia.Abrir;
 import com.qst1.vo.Aluno;
-import com.qst1.vo.Disciplina;
+import com.recursos.AlunosTable;
 import com.recursos.InOut;
 
 import javax.swing.JMenuBar;
@@ -30,12 +27,11 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import javax.swing.JLabel;
 import java.awt.SystemColor;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
 
 import java.awt.Font;
 import javax.swing.JButton;
-import java.awt.Color;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import java.awt.FlowLayout;
@@ -49,31 +45,24 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
-import javax.swing.JList;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
-import javax.swing.border.BevelBorder;
 import java.awt.Toolkit;
 import javax.swing.JToolBar;
-import java.awt.Component;
-import javax.swing.Box;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.JToggleButton;
 
 public class FrmPrincipal extends JFrame {
 
 	private JPanel mainPane;
 	
-	private static AlunoDAO listaAluno;
 	private static boolean ProgramaJaRodou = false;
 		
 	private 	JDesktopPane 	desktopPane;
 	
 	protected 	JPanel 		contentPane;
-	private 	JLabel		lblPesquisar;
 	
 	private		static		JTable		table;	
-	private		static		DefaultTableModel modelo;
+	private 	static		AlunosTable modelo;
 
 	private Integer matricula;
 	private String nome;
@@ -136,6 +125,11 @@ public class FrmPrincipal extends JFrame {
 					InOut.OutMessage("Infelizmente não foi possivel se conectar com o Servidor."
 							+ "\nPor favor tente mais tarde", "ERROR", 0);
 					System.exit(0);
+				}else{
+					ManipulaDados.Desconectar();
+					//checar se tem dado
+					ManipulaDados.LerBanco();
+					PreencherTabela();
 				}
 			}
 		});
@@ -143,6 +137,8 @@ public class FrmPrincipal extends JFrame {
 		setTitle("Gerenciador de Faculdade");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 900, 660);		
+		
+		modelo = new AlunosTable();
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -333,27 +329,14 @@ public class FrmPrincipal extends JFrame {
 				ManipulaDados.MudaCampos(aluno);
 			}
 		});
-		scrollPane.setViewportView(table);
-		table.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"Matricula", "Nome", "CPF"
-			}
-		) {
-			Class[] columnTypes = new Class[] {
-				Integer.class, String.class, String.class
-			};
-			public Class getColumnClass(int columnIndex) {
-				return columnTypes[columnIndex];
-			}
-			boolean[] columnEditables = new boolean[] {
-				false, false, false
-			};
-			public boolean isCellEditable(int row, int column) {
-				return columnEditables[column];
-			}
-		});
+		scrollPane.setViewportView(table);		
+		table.setModel(modelo);
+		table.getColumnModel().getColumn(0).setResizable(false);
+		table.getColumnModel().getColumn(0).setPreferredWidth(70);
+		table.getColumnModel().getColumn(1).setResizable(false);
+		table.getColumnModel().getColumn(1).setPreferredWidth(150);
+		table.getColumnModel().getColumn(2).setResizable(false);
+		table.getColumnModel().getColumn(2).setPreferredWidth(140);
 		
 		JPanel panel = new JPanel();
 		mainPane.add(panel, BorderLayout.SOUTH);
@@ -459,19 +442,13 @@ public class FrmPrincipal extends JFrame {
 		toolBar_3.add(btnCadGrade);
 		btnCadGrade.setEnabled(false);
 		btnCadGrade.setIcon(new ImageIcon(FrmPrincipal.class.getResource("/com/qst1/images/grade32.png")));
-		table.getColumnModel().getColumn(0).setResizable(false);
-		table.getColumnModel().getColumn(0).setPreferredWidth(70);
-		table.getColumnModel().getColumn(1).setResizable(false);
-		table.getColumnModel().getColumn(1).setPreferredWidth(150);
-		table.getColumnModel().getColumn(2).setResizable(false);
-		table.getColumnModel().getColumn(2).setPreferredWidth(140);
 	}
 	
 	private void Importar(){
 		//TODO Método Importar
 		ManipulaDados.LimparLista();		
 		ManipulaDados.Carregar("DadosAluno.json");
-		AttLista();
+		PreencherTabela();
 	}
 	private void Exportar(){
 		//TODO Método Importar		
@@ -523,11 +500,10 @@ public class FrmPrincipal extends JFrame {
     	//TODO metodo Novo
     	SalvarTabela();
     	ManipulaDados.LimparLista();
-    	AttLista();
+    	PreencherTabela();
     	setTitle("Gerenciador de Faculdade");
     }    
     private void SalvarTabela(){
-    	modelo = (DefaultTableModel) table.getModel();
     	if(modelo.getRowCount() > 0){
     		int op = InOut.ConfirmDialog("Deseja salvar a tabela atual?", "Salvar");
     		if(op == 0){//sim
@@ -553,7 +529,7 @@ public class FrmPrincipal extends JFrame {
 		try{
 			if(!arquivo.equals("") && arquivo.endsWith("json")){
 				ManipulaDados.Carregar(arquivo);
-				AttLista();
+				PreencherTabela();
 				setTitle("Gerenciador de Faculdade - "+arquivo);
 			}
 		}catch(Exception e){
@@ -582,6 +558,8 @@ public class FrmPrincipal extends JFrame {
         int result = fc.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             arquivo = fc.getSelectedFile().getAbsolutePath();
+            arquivo = arquivo.replace(".json", "");
+            arquivo += ".json";
         }else{
         	arquivo = "";
         }
@@ -599,33 +577,14 @@ public class FrmPrincipal extends JFrame {
         	arquivo = "";
         }
     }
-    
-    protected static void AttLista(){
-		listaAluno = ManipulaDados.getListaAluno();
-		PreencherTabela();
-	}
-	
+   
 	protected static void setTableEnable(boolean mode){
 		table.setEnabled(mode);
 	}
 	
 	protected static void PreencherTabela(){
-		try{
-			modelo = (DefaultTableModel) table.getModel();
-			if(modelo.getRowCount() > 0){
-				modelo.setRowCount(0);
-			}
-			if(listaAluno.getLista().size() <= 0){
-				return;
-			}
-			for(Aluno aluno : listaAluno.getLista()){
-				Object [] obj = {
-					aluno.getMatricula(),
-					aluno.getNome(),
-					aluno.getCPF()
-				};
-				modelo.addRow(obj);
-			}
+		try{			
+			modelo.setValue(ManipulaDados.getListAluno());
 		}catch(Exception e){
 			e.printStackTrace();
 		}
