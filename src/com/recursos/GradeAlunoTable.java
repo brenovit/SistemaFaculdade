@@ -8,18 +8,18 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
 import com.vo.Aluno;
+import com.vo.Disciplina;
 
-public class AlunosTable extends AbstractTableModel{
+public class GradeAlunoTable extends AbstractTableModel{
 	//constantes para indetificar as colunas
-	private final int MATRICULA = 0;
+	private final int CODIGO = 0;
 	private final int NOME = 1;
-	private final int CPF = 2;
 	
-	private String[] columns = {"Matricula", "Nome", "CPF"};
-	private List<Aluno> dados;
+	private String[] columns = {"Código", "Nome"};
+	private List<Disciplina> dados;
 	
-	public AlunosTable(){
-		dados = new ArrayList<Aluno>();
+	public GradeAlunoTable(){
+		dados = new ArrayList<Disciplina>();
 		this.addTableModelListener(new TableModelListener(){
 			@Override
 			public void tableChanged(TableModelEvent tme) {
@@ -44,38 +44,30 @@ public class AlunosTable extends AbstractTableModel{
 		return dados.size();
 	}
 	
-	@Override
-	public boolean isCellEditable(int row, int column){
-		if(column != MATRICULA)
-			return true;
-		return false;
-	}
 	
 	@Override
 	public Object getValueAt(int row, int column) {					//return a value in a row
 		// TODO Auto-generated method stub
 		switch(column){
-			case MATRICULA: return dados.get(row).getMatricula();
-			case NOME: 		return dados.get(row).getNome();
-			case CPF: 		return dados.get(row).getCPF();
+			case CODIGO: 			return dados.get(row).getCodigo();
+			case NOME: 				return dados.get(row).getNome();
 			default:		throw new IndexOutOfBoundsException("Invalid Column");
 		}
 	}
 	
 	@Override
 	public void setValueAt(Object value, int row, int column){		//set 
-			if(value == null)	return;
-			switch (column) {
-				case NOME: dados.get(row).setNome((String)value);break;
-				case CPF: dados.get(row).setCPF((String)value);break;
-			}
+		if(value == null)	return;
+		switch (column) {
+			case NOME: dados.get(row).setNome((String)value);break;
+			default:		throw new IndexOutOfBoundsException("Invalid Column");
+		}
 	}
 	
 	public Class<?> getColumnClass(int column) {
 		switch(column){
-			case MATRICULA: return int.class;
 			case NOME: 		return String.class;
-			case CPF: 		return String.class;
+			case CODIGO: 	return Integer.class;
 			default:		throw new IndexOutOfBoundsException("Invalid Column");
 		}
 	}
@@ -84,7 +76,7 @@ public class AlunosTable extends AbstractTableModel{
 	 * adiciona uma linha na tabela
 	 * @param o
 	 */
-	public void addRow(Aluno o){
+	public void addRow(Disciplina o){
 		this.dados.add(o);
 		this.fireTableDataChanged();
 		//this.fireTableRowsInserted(indexOf(o), indexOf(o));
@@ -94,7 +86,7 @@ public class AlunosTable extends AbstractTableModel{
 	 * preenche toda a tabela com uma lista
 	 * @param dataIn
 	 */
-	public void addRowAll(List<Aluno> dataIn){
+	public void addRowAll(List<Disciplina> dataIn){
 		dados.addAll(dataIn);
 		this.fireTableDataChanged();
 	}
@@ -122,7 +114,7 @@ public class AlunosTable extends AbstractTableModel{
 	 * @param row(linha) 
 	 * @return
 	 */
-	public Aluno getValue(int row){
+	public Disciplina getValue(int row){
 		return this.dados.get(row);
 	}
 	
@@ -133,7 +125,7 @@ public class AlunosTable extends AbstractTableModel{
 	 * Substitui todos os valores da tabela
 	 * @param lista
 	 */
-	public void setValue(List<Aluno> lista){
+	public void setValue(List<Disciplina> lista){
 		dados = lista;
 		this.fireTableDataChanged();
 	}
