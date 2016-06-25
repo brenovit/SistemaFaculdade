@@ -3,12 +3,11 @@ package com.recursos;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
 import com.vo.Aluno;
 
+@SuppressWarnings("serial")
 public class AlunosTable extends AbstractTableModel{
 	//constantes para indetificar as colunas
 	private final int MATRICULA = 0;
@@ -20,13 +19,6 @@ public class AlunosTable extends AbstractTableModel{
 	
 	public AlunosTable(){
 		dados = new ArrayList<Aluno>();
-		this.addTableModelListener(new TableModelListener(){
-			@Override
-			public void tableChanged(TableModelEvent tme) {
-				// TODO Auto-generated method stub
-				int row = tme.getFirstRow();
-			}			
-		});		
 	}
 	
 	@Override
@@ -46,8 +38,6 @@ public class AlunosTable extends AbstractTableModel{
 	
 	@Override
 	public boolean isCellEditable(int row, int column){
-		if(column != MATRICULA)
-			return true;
 		return false;
 	}
 	

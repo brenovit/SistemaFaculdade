@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.dao.AlunoDAO;
 import com.dao.Banco;
-import com.dao.GradeEscolar;
+import com.dao.DisciplinaDAO;
 import com.persistencia.SaveLoadFile;
 import com.recursos.InOut;
 import com.vo.Aluno;
@@ -13,7 +13,8 @@ import com.vo.Disciplina;
 public class ManipulaDados{
 	
 	private static AlunoDAO dataAluno = new AlunoDAO();
-	private static GradeEscolar grade = new GradeEscolar();
+	private static DisciplinaDAO dataDisciplina = new DisciplinaDAO();
+	
 	private static SaveLoadFile SaveLoad = new SaveLoadFile();
 	
 	protected static void CadastrarAluno(Aluno aluno){
@@ -37,28 +38,27 @@ public class ManipulaDados{
 	}
 	
 	protected static boolean PesquisarAluno(Aluno aluno){
-		if(dataAluno.Find(aluno,true) != -1){
+		if(dataAluno.Read(aluno,true) != -1)
 			return true;
-		}
 		return false;
 	}
 	
 	protected static boolean AdicionarMateria(Aluno aluno, Disciplina disc){		
-		if(dataAluno.FindMateria(aluno, disc) == -1){
-			grade.CadastrarGrade(aluno, disc);	
+		if(dataAluno.CadastrarGrade(aluno, disc))			
 			return true;
-		}
 		return false;		
 	}
 	
-	protected static void RemoverMateria(Aluno aluno, Disciplina disc){		
-		dataAluno.RemoverGrade(aluno, disc);
+	protected static boolean RemoverMateria(Aluno aluno, Disciplina disc){
+		if(dataAluno.RemoverGrade(aluno, disc))			
+			return true;
+		return false;		
 	}
 	
-	protected static List<Disciplina> DisciplinasCadastradas(Aluno aluno){			
+	protected static List<Disciplina> DisciplinasCadastradas(Aluno aluno){			//melhorar
 		List<Disciplina> listaDisciplina = null;
 		
-		if(dataAluno.Find(aluno, true) != -1){
+		if(dataAluno.Read(aluno, true) != -1){
 			listaDisciplina = aluno.getMaterias();
 		}	
 		
@@ -66,14 +66,13 @@ public class ManipulaDados{
 	}
 		
 	protected static boolean EditarNota(Aluno aluno, Disciplina disc, Double nota){		
-		if(dataAluno.AddNota(aluno, disc, nota)){
+		if(dataAluno.AddNota(aluno, disc, nota))
 			return true;
-		}
 		return false;
 	}
 	
 	public static void CadastrarDisciplinas(){
-		if(grade.isEmpty()){
+		if(dataDisciplina.isEmpty()){
 			String [] discs = {
 					"Programação Orientada a Objetos", 
 					"Estrutura de Dados",
@@ -86,7 +85,7 @@ public class ManipulaDados{
 					"Sistemas de Informações"};
 			for(int i = 0; i < discs.length; i++){
 				Disciplina disc = new Disciplina(discs[i]);
-				grade.Create(disc);
+				dataDisciplina.Create(disc);
 			}			
 		}else{
 			return;
@@ -101,18 +100,19 @@ public class ManipulaDados{
 		return dataAluno.getLista();
 	}
 	
-	protected static GradeEscolar getGradeEscolar(){
-		return grade;
+	protected static DisciplinaDAO getGradeEscolar(){
+		return dataDisciplina;
 	}
 	
 	protected static List<Disciplina> getListDisciplina(){
-		return grade.getLista();
+		return dataDisciplina.getLista();
 	}
+	
 	protected static void MudaCampos(Aluno aluno){
-		InternalFrameCadastroAluno.MudarCampos(aluno);
-		InternalFrameCadastrarGradeAluno.MudarCampos(aluno);
-		InternalFrameCadastrarGradeAluno.AttLista(aluno);
-		InternalFrameInserirNota.MudarCampos(aluno);
+		InternalFrameCadastroAluno.MudarCampos(aluno);			//Atualiza os campos da janela de cadastrar aluno
+		InternalFrameCadastrarGradeAluno.MudarCampos(aluno);	//Atualiza os campos da janela de cadastrar grade em aluno
+		InternalFrameCadastrarGradeAluno.AttLista(aluno);		//Atualiza os campos da janela de cadastrar aluno
+		InternalFrameInserirNota.MudarCampos(aluno);			//Atualiza os campos da janela de alterar as disciplinas do aluno
 	}
 	
 	protected static void Salvar(String arquivo){
@@ -121,7 +121,7 @@ public class ManipulaDados{
 	}
 	
 	protected static void Carregar(String arquivo){	
-		if(!SaveLoad.LoadData(grade, arquivo, dataAluno)){
+		if(!SaveLoad.LoadData(dataDisciplina, arquivo, dataAluno)){
 			InOut.OutMessage("Não foi possivel Importar os dados,\n"
 					+ "Por favor verifique se o arquivo se encontra no sistema", "ERRO", 2);
 		}
@@ -153,7 +153,7 @@ public class ManipulaDados{
 	}
 	
 	protected static void LerBanco(){
-		dataAluno.Read();
-		grade.Read();
+		dataDisciplina.FeedSystem();
+		dataAluno.FeedSystem();
 	}
 }

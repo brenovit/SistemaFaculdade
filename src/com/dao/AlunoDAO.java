@@ -1,22 +1,10 @@
 package com.dao;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.Gson;
-import com.recursos.AlunosTable;
 import com.recursos.InOut;
 import com.vo.Aluno;
 import com.vo.Disciplina;
@@ -24,8 +12,10 @@ import com.vo.Disciplina;
 public class AlunoDAO implements DAO {
 	private List<Aluno> listaAluno;
 	private List<Disciplina> listaDisciplina;
+	
 	private String msg = "";	
-	private PreparedStatement pst =null;
+	
+	private PreparedStatement pst = null;
 	
 	public AlunoDAO(){
 		super();
@@ -57,44 +47,13 @@ public class AlunoDAO implements DAO {
 		listaAluno.add(object);
 	}
 	
-	public void Read(){
-		try {
-			String sql = "SELECT id, nome, cpf FROM alunos";
-			pst = Banco.Connect().prepareStatement(sql);
-			ResultSet rs = pst.executeQuery(sql);
-			//ResultSetMetaData rsmd = rs.getMetaData();
-			while(rs.next()){
-				Integer matricula = Integer.parseInt(rs.getString(1));
-				String  nome = rs.getString(2);
-				String cpf = rs.getString(3);
-				Aluno aluno = new Aluno(nome, matricula, cpf);
-				Aluno.setGerador(matricula);
-				listaAluno.add(aluno);
-			}
-		} catch (Exception e) {
-			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - LEITURA", 1);
-		}
+	@Override
+	public int Read(Object o) {
+		return Read(o, false);
 	}
 	
 	@Override
-	public String Show() {
-		msg = "";
-		for(Aluno aluno : listaAluno){
-			msg += "\nMatricula: " + aluno.getMatricula()+
-					"\nNome: " + aluno.getNome()+
-					"\nCPF: " + aluno.getCPF()+
-					"\n------------------------------------";
-		}
-		return msg;
-	}
-	
-	@Override
-	public int Find(Object o) {
-		return Find(o, false);
-	}
-	
-	@Override
-	public int Find(Object o, boolean alterar) {
+	public int Read(Object o, boolean alterar) {
         int posicao = -1;        
         int posAux = 0;
         
@@ -130,7 +89,7 @@ public class AlunoDAO implements DAO {
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - UPDATE", 1);
 		}
 		
-        int posicao = Find(object,false);
+        int posicao = Read(object,false);
         if(posicao != -1){
         	listaAluno.get(posicao).setNome(object.getNome());
         	listaAluno.get(posicao).setCPF(object.getCPF());
@@ -143,7 +102,7 @@ public class AlunoDAO implements DAO {
 		try{
 			String sql = "DELETE FROM alunos WHERE id = ?";
 			pst = Banco.Connect().prepareStatement(sql);
-			pst.setString(1, object.getMatricula().toString());
+			pst.setInt(1, object.getMatricula());
 			pst.executeUpdate();
 			Banco.Disconnect();
 			return true;
@@ -151,67 +110,197 @@ public class AlunoDAO implements DAO {
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - DELETE", 1);
 		}
 		
-	    int posicao = Find(object,false);
+	    int posicao = Read(object,false);
 	    if(posicao != -1){
 	    	listaAluno.remove(posicao);	
 	    	return true;
 	    }
 	    return false;
 	}
-		
-	public String ShowDisciplinasMatriculadas(Aluno aluno) {
+
+	@Override
+	public String Show() {
 		msg = "";
-		int pos = Find(aluno,false);
-		if(pos != -1){
-			listaDisciplina = aluno.getMaterias();
-			for(Disciplina disciplina : listaDisciplina){
-				msg += "\nCodigo: " + disciplina.getCodigo() +
-						"\nNome: " + disciplina.getNome() +
-						"\nNota: " + disciplina.getNota() +
-						"\nAprovado: " + disciplina.getAprovado() +
-						"\n------------------------------------";
-			}
+		for(Aluno aluno : listaAluno){
+			msg += "\nMatricula: " + aluno.getMatricula()+
+					"\nNome: " + aluno.getNome()+
+					"\nCPF: " + aluno.getCPF()+
+					"\n------------------------------------";
 		}
 		return msg;
-	}
-	
-	public int FindMateria(Aluno aluno, Disciplina disc){
-		int pos = Find(aluno,true);
-		if(pos != -1){
-			int posAux = 0;
-			pos = -1;
-			listaDisciplina = aluno.getMaterias();
-			while((posAux < listaDisciplina.size()) && 
-					(!listaDisciplina.get(posAux).getCodigo().equals(disc.getCodigo()))){
-				posAux++;
-			}
-			if((posAux < listaDisciplina.size()) && 
-					(listaDisciplina.get(posAux).getCodigo().equals(disc.getCodigo())) == true){
-				pos = posAux;
-			}
-		}
-		return pos;
-	}
-	
-	public void RemoverGrade(Aluno aluno, Disciplina disc){
-		int pos = FindMateria(aluno, disc);
-		if(pos != -1){
-			aluno.removeDisciplina(pos);
-		}
-	}
-	
-	public boolean AddNota(Aluno aluno, Disciplina disc, Double nota){
-		int pos = FindMateria(aluno, disc);
-		if(pos != -1){
-			listaDisciplina = aluno.getMaterias();
-			listaDisciplina.get(pos).setNota(nota);
-			return true;
-		}
-		return false;
 	}
 	
 	public void LimparLista(){
 		Aluno.zerarGerador();
 		listaAluno.clear();
+	}
+	
+	public String ShowDisciplinasMatriculadas(Aluno aluno) {
+		msg = "";
+		listaDisciplina = aluno.getMaterias();
+		for(Disciplina disciplina : listaDisciplina){
+			msg += "\nCodigo: " + disciplina.getCodigo() +
+					"\nNome: " + disciplina.getNome() +
+					"\nNota: " + disciplina.getNota() +
+					"\nAprovado: " + disciplina.getAprovado() +
+					"\n------------------------------------";
+		}
+		return msg;
+	}
+	
+	public boolean CadastrarGrade(Aluno aluno, Disciplina disc){
+		try {
+			String sql = "INSERT INTO grade_aluno (id_aluno,id_disciplina) VALUES (?,?)";
+			pst = Banco.Connect().prepareStatement(sql);
+			pst.setString(1, aluno.getMatricula().toString());
+			pst.setString(2, disc.getCodigo().toString());
+			pst.executeUpdate();
+			Banco.Disconnect();
+		} catch (Exception e) {
+			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - INSERIR GRADE", 1);
+		}
+		
+		try {
+			int pos = Read(aluno);
+			if(pos != -1){
+				listaAluno.get(pos).addMateria(disc);
+				return true;
+			}			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	public int FindMateria(Aluno aluno, Disciplina disc){		
+		try {
+			String sql = "SELECT id_disciplina FROM grade_aluno";
+			pst = Banco.Connect().prepareStatement(sql);
+			ResultSet rs = (pst = Banco.Connect().prepareStatement(sql)).executeQuery(sql);
+			Integer codigo = 0;
+			while(rs.next()){
+				codigo = rs.getInt(1);
+				if(codigo.equals(disc.getCodigo())){
+					break;				
+				}
+			}
+			if(!codigo.equals(disc.getCodigo())){
+				return -1;
+			}
+			
+		} catch (Exception e) {
+			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - LEITURA", 1);
+		}
+		
+		int pos = Read(aluno);
+		int posAux = 0;		
+		try {			
+			if(pos != -1){							
+				listaDisciplina = listaAluno.get(pos).getMaterias();
+				pos = -1;
+				while((posAux < listaDisciplina.size()) && 
+						(!listaDisciplina.get(posAux).getCodigo().equals(disc.getCodigo()))){
+					posAux++;
+				}
+				if((posAux < listaDisciplina.size()) && 
+						(listaDisciplina.get(posAux).getCodigo().equals(disc.getCodigo())) == true){
+					pos = posAux;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+		return pos;		
+	}
+	
+	public boolean RemoverGrade(Aluno aluno, Disciplina disc){
+		try {
+			String sql = "DELETE FROM grade_aluno WHERE id_aluno = ? AND ? id_disciplinas = ?";
+			pst = Banco.Connect().prepareStatement(sql);
+			pst.setInt(1, aluno.getMatricula());
+			pst.setInt(2, disc.getCodigo());
+			pst.executeUpdate();
+			Banco.Disconnect();
+		} catch (Exception e) {
+			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - DELETE", 1);
+		}
+		
+		try {
+			int pos = FindMateria(aluno, disc);
+			if(pos != -1){
+				listaAluno.get(pos).removeDisciplina(pos);
+				return true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	public boolean AddNota(Aluno aluno, Disciplina disc, Double nota){
+		try {
+			String sql = "UPDATE grade_aluno SET nota = ? WHERE id_aluno = ? AND id_disciplina = ?";
+			pst = Banco.Connect().prepareStatement(sql);
+			pst.setDouble(1, nota);
+			pst.setInt(2, aluno.getMatricula());
+			pst.setInt(3, disc.getCodigo());
+			pst.executeUpdate();
+			Banco.Disconnect();
+		} catch (Exception e) {
+			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - DELETE", 1);
+		}
+		
+		try {
+			int posAlu = Read(aluno);
+			int posDisc = FindMateria(aluno, disc);
+			if(posDisc != -1){				
+				listaAluno.get(posAlu).getMaterias().get(posDisc).setNota(nota);
+				return true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	public void FeedSystem(){	//Alimentar o Sistema
+		try {
+			String sql = "SELECT id, nome, cpf FROM alunos";
+			/*pst = Banco.Connect().prepareStatement(sql);
+			ResultSet rs = pst.executeQuery(sql);*/
+			ResultSet rs = (pst = Banco.Connect().prepareStatement(sql)).executeQuery(sql);
+			while(rs.next()){
+				Integer matricula = Integer.parseInt(rs.getString(1));
+				String  nome = rs.getString(2);
+				String cpf = rs.getString(3);
+				
+				Aluno aluno = new Aluno(nome, matricula, cpf);
+				Aluno.setGerador(matricula);
+				listaAluno.add(aluno);				
+			}			
+			Banco.Disconnect();
+			
+			sql = "SELECT id_aluno, id_disciplina, nota FROM grade_aluno";
+			pst = Banco.Connect().prepareStatement(sql);
+			rs = (pst = Banco.Connect().prepareStatement(sql)).executeQuery(sql);
+			while(rs.next()){
+				Integer matricula = Integer.parseInt(rs.getString(1));
+				Integer codigo = Integer.parseInt(rs.getString(2));
+				Double nota = Double.parseDouble(rs.getString(3));			
+				
+				Aluno aluno = new Aluno();
+				aluno.setMatricula(matricula);
+				
+				Disciplina disc = new Disciplina();
+				disc.setCodigo(codigo);
+				
+				CadastrarGrade(aluno, disc);
+				AddNota(aluno, disc, nota);				
+			}
+			
+			Banco.Disconnect();
+		} catch (Exception e) {
+			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - ALIMENTAÇÃO", 1);
+		}
 	}
 }

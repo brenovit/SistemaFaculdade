@@ -3,10 +3,9 @@ package com.testes;
 import java.util.ArrayList;
 
 import com.dao.AlunoDAO;
-import com.dao.GradeEscolar;
+import com.dao.DisciplinaDAO;
 import com.recursos.InOut;
 import com.ui.SystemManager;
-import com.ui.TelaAluno;
 import com.vo.Aluno;
 import com.vo.Disciplina;
 
@@ -15,17 +14,16 @@ public class TesteQuestao1 {
 		SystemManager sm = new SystemManager();
 		//lista de alunos cadastrados
 		AlunoDAO lista = new AlunoDAO();
-		AlunoDAO lista2 = new AlunoDAO();
 		
 		//criar os aluno
 		Aluno al1 = new Aluno("Breno", "01234567890");
 		Aluno al2 = new Aluno("Mauricio", "09876543210");
-		Aluno al3 = new Aluno("Mateus", "1238569753");
+		Aluno al3 = new Aluno("Fabio", "1238569753");
 		
 		//cadastrar alunos
 		lista.Create(al1);
 		lista.Create(al2);
-		/*lista.Create(al3);
+		lista.Create(al3);
 		
 		//mostrar alunos cadastrados
 		lista.Show();
@@ -34,27 +32,27 @@ public class TesteQuestao1 {
 		Aluno obj = new Aluno();
 		obj.setMatricula(3);	//<- obj.setMatricula(al3.getMatricula());
 		obj.setNome("Hulk");
-		obj.setCPF("147258369");
-		lista.Uptade(obj);
+		obj.setCPF("1238569753");
+		lista.Update(obj);
 		
 		//deletar aluno
-		lista.Delete(al2);
+		//lista.Delete(al2);
 		
 		//mostrar todos os alunos cadastrados
 		lista.Show();		
 		
 		//procurar aluno na lista
-		lista.Find(al3);
+		lista.Read(al3);
 		
 		//checar existencia do aluno na lista
-		if(lista.Find(al1) == -1 ){
+		if(lista.Read(al1) == -1 ){
 			InOut.OutMessage("Aluno não cadastrado");
 		}else{
 			InOut.OutMessage("Aluno Cadastrado\nNome: " + al1.getNome());
-		}*/
+		}
 		
 		//criar grade escolar
-		GradeEscolar grade = new GradeEscolar();
+		DisciplinaDAO grade = new DisciplinaDAO();
 		
 		//criar as materias
 		Disciplina disc1 = new Disciplina("POO");		
@@ -62,12 +60,12 @@ public class TesteQuestao1 {
 		Disciplina disc3 = new Disciplina("ASIC");
 		Disciplina disc4 = new Disciplina("PI");
 		
-		/*grade.CadastrarDisciplina(disc1);
-		grade.CadastrarDisciplina(disc2);
-		grade.CadastrarDisciplina(disc3);
-		grade.CadastrarDisciplina(disc4);*/
+		grade.Create(disc1);
+		grade.Create(disc2);
+		grade.Create(disc3);
+		grade.Create(disc4);
 		
-		grade.CadastrarGrade(al1, disc1);
+		/*grade.CadastrarGrade(al1, disc1);
 		grade.CadastrarGrade(al1, disc2);
 		grade.CadastrarGrade(al1, disc3);
 		
@@ -75,12 +73,12 @@ public class TesteQuestao1 {
 		
 		grade.CadastrarGrade(al2, disc1);
 		grade.CadastrarGrade(al2, disc2);
-		grade.CadastrarGrade(al2, disc4);
+		grade.CadastrarGrade(al2, disc4);*/
 		
-		lista.AddNota(al2,disc2,1.0);
+		/*lista.AddNota(al2,disc2,1.0);
 		lista.AddNota(al2,disc4,7.0);		
 		
-		lista.AddNota(al1,disc1,5.0);
+		lista.AddNota(al1,disc1,5.0);*/
 		/*lista.AddNota(al1,disc2,8.0);
 		lista.AddNota(al1,disc3,7.0);*/
 		
@@ -88,9 +86,9 @@ public class TesteQuestao1 {
 		
 		//lista2.LoadDataFile(grade);
 		
-		InOut.OutMessage("Lista 1: \n" + lista.Show() + "\nLista 2: \n" + lista2.Show());
+		//InOut.OutMessage("Lista 1: \n" + lista.Show() + "\nLista 2: \n" + lista2.Show());
 		
-		InOut.OutMessage("Lista 1: \n" + lista.ShowDisciplinasMatriculadas(al2) + "\nLista 2: \n" + lista2.ShowDisciplinasMatriculadas(al2));
+		//InOut.OutMessage("Lista 1: \n" + lista.ShowDisciplinasMatriculadas(al2) + "\nLista 2: \n" + lista2.ShowDisciplinasMatriculadas(al2));
 		/*disc = new Disciplina("PI");
 		grade.CadastrarDisciplina(disc);
 		grade.CadastrarGrade(al1, disc);

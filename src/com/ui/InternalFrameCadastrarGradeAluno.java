@@ -17,9 +17,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 
-import com.dao.GradeEscolar;
 import com.recursos.GradeAlunoTable;
 import com.recursos.InOut;
 import com.vo.Aluno;
@@ -34,17 +32,17 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
+@SuppressWarnings("serial")
 public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
-	
 	private JTextField txtMateria;
 	private static JTextField txtMatricula;
 	private static JTextField txtNome;
 	private JTextField txtPesquisa;
 	private static JTable table;
-	private static JList list;
+	private static JList<Disciplina> list;
 	
 	private static GradeAlunoTable modeloT;
-	private static DefaultListModel modeloL = new DefaultListModel();
+	private static DefaultListModel<Disciplina> modeloL = new DefaultListModel<Disciplina>();
 	
 	private		Integer	codigo;
 	private		int		pos = -1;
@@ -92,7 +90,7 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 		lblDisciplinasCadastradas.setBounds(300, 50, 149, 20);
 		panel_1.add(lblDisciplinasCadastradas);
 		
-		list = new JList();
+		list = new JList<Disciplina>();
 		list.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -258,7 +256,7 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 		JButton btnRemover = new JButton("");
 		btnRemover.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO Adcionar materia > Aluno
+				//TODO Remover materia > Aluno
 				if(CamposVazios("Remover uma máteria de"))
 					return;
 				
@@ -268,7 +266,7 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 				}
 				
 				matricula = Integer.parseInt(txtMatricula.getText());
-				codigo = ((Disciplina) ((DefaultListModel)list.getModel()).getElementAt(pos)).getCodigo();
+				codigo = modeloL.getElementAt(pos).getCodigo();
 				pos = -1;
 				
 				Disciplina disc = new Disciplina();
@@ -299,17 +297,16 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 	}
 	
 	protected static void AttLista(Aluno aluno){
-		//TODO	AttLista		
+		//TODO	Atualiza a lista de Disciplinas cadastradas no aluno		
 		List<Disciplina> listaDisciplina = ManipulaDados.DisciplinasCadastradas(aluno);
-				
-		if(modeloL.getSize() > 0)
-			modeloL.clear();
+		
+		modeloL.clear();
 
 		if(listaDisciplina.size() == 0)
 			return;
 		
 		for(Disciplina disc : listaDisciplina){
-			((DefaultListModel)list.getModel()).addElement(disc);
+			modeloL.addElement(disc);
 		}		
 	}
 	

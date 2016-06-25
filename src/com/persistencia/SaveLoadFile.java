@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import com.dao.AlunoDAO;
-import com.dao.GradeEscolar;
+import com.dao.DisciplinaDAO;
 import com.google.gson.Gson;
 import com.recursos.InOut;
 import com.vo.Aluno;
@@ -33,7 +33,7 @@ public class SaveLoadFile {
 		}
 	}
 	
-	public boolean LoadData(GradeEscolar grade, String file, AlunoDAO listaAluno){
+	public boolean LoadData(DisciplinaDAO grade, String file, AlunoDAO listaAluno){
 		File arq = new File(file);
 		Gson gson = new Gson();
 		try {

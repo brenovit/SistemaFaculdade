@@ -3,13 +3,12 @@ package com.recursos;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
 import com.vo.Aluno;
 import com.vo.Disciplina;
 
+@SuppressWarnings("serial")
 public class GradeAlunoTable extends AbstractTableModel{
 	//constantes para indetificar as colunas
 	private final int CODIGO = 0;
@@ -20,13 +19,6 @@ public class GradeAlunoTable extends AbstractTableModel{
 	
 	public GradeAlunoTable(){
 		dados = new ArrayList<Disciplina>();
-		this.addTableModelListener(new TableModelListener(){
-			@Override
-			public void tableChanged(TableModelEvent tme) {
-				// TODO Auto-generated method stub
-				int row = tme.getFirstRow();
-			}			
-		});		
 	}
 	
 	@Override

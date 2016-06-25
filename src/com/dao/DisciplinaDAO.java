@@ -9,13 +9,13 @@ import com.recursos.InOut;
 import com.vo.Aluno;
 import com.vo.Disciplina;
 
-public class GradeEscolar implements DAO{
+public class DisciplinaDAO implements DAO{
 	
 	private List<Disciplina> listaDisc;
 	private String msg = "";
 	private PreparedStatement pst = null;
 	
-	public GradeEscolar(){
+	public DisciplinaDAO(){
 		listaDisc = new ArrayList<Disciplina>();	
 	}
 	
@@ -40,7 +40,7 @@ public class GradeEscolar implements DAO{
 		
 	}
 	
-	public void Read(){
+	public void FeedSystem(){
 		try {
 			String sql = "SELECT id,nome FROM disciplinas";
 			pst = Banco.Connect().prepareStatement(sql);
@@ -71,13 +71,13 @@ public class GradeEscolar implements DAO{
 	}
 	
 	@Override
-	public int Find(Object o) {
+	public int Read(Object o) {
 		//TODO Find
-		return Find(o, false);
+		return Read(o, false);
 	}
 	
 	@Override
-	public int Find(Object o, boolean alterar) {
+	public int Read(Object o, boolean alterar) {
 		//TODO Find
 		Disciplina disc = (Disciplina) o;
 		int posicao = -1;        
@@ -112,7 +112,7 @@ public class GradeEscolar implements DAO{
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - INSERT", 1);		
 		}
 		
-		int posicao = Find(disc,false);
+		int posicao = Read(disc,false);
         if(posicao != -1){
         	listaDisc.get(posicao).setNome(disc.getNome());
         }
@@ -130,7 +130,7 @@ public class GradeEscolar implements DAO{
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - DELETE", 1);
 		}
 		
-		int pos = Find(disc,false);
+		int pos = Read(disc,false);
 		if(pos != -1){
 			listaDisc.remove(pos);
 			return true;
@@ -138,25 +138,12 @@ public class GradeEscolar implements DAO{
 			InOut.OutMessage("Disciplina não Cadastrado");
 		return false;
 	}
-		
-	public void CadastrarGrade(Aluno aluno, Disciplina disc){
-		try {
-			String sql = "INSERT INTO grade_aluno (id_aluno,id_disciplina) VALUES (?,?)";
-			pst = Banco.Connect().prepareStatement(sql);
-			pst.setString(1, aluno.getMatricula().toString());
-			pst.setString(2, disc.getCodigo().toString());
-			pst.executeUpdate();
-			Banco.Disconnect();
-		} catch (Exception e) {
-			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - DELETE", 1);
-		}
-		
-		int pos = Find(disc,true);
-		if(pos != -1){
-			aluno.addMateria(disc);
-		}
-	}
 	
+	/**
+	 * Verifica se a tabela de disciplinas esta vazia
+	 * @return
+	 * true se estiver vazia, false se tiver item.
+	 */
 	public boolean isEmpty(){
 		try {
 			String sql = "SELECT * FROM disciplinas";

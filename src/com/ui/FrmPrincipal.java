@@ -18,7 +18,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.ImageIcon;
 import javax.swing.JSeparator;
-import javax.swing.JInternalFrame;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
@@ -48,8 +47,8 @@ import java.awt.Toolkit;
 import javax.swing.JToolBar;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import javax.swing.JToggleButton;
 
+@SuppressWarnings("serial")
 public class FrmPrincipal extends JFrame {
 
 	private JPanel mainPane;
@@ -120,18 +119,8 @@ public class FrmPrincipal extends JFrame {
 			}
 			@Override
 			public void windowOpened(WindowEvent arg0) {
-				if(!ManipulaDados.Conectar()){
-					InOut.OutMessage("Infelizmente não foi possivel se conectar com o Servidor."
-							+ "\nPor favor tente mais tarde", "ERROR", 0);
-					System.exit(0);
-				}else{
-					ManipulaDados.Desconectar();
-					//checar se tem dado
-					ManipulaDados.LerBanco();
-					PreencherTabela();
-					ManipulaDados.CadastrarDisciplinas();
-				}
-			}
+				IniciarSistema();
+			}			
 		});
 		setIconImage(Toolkit.getDefaultToolkit().getImage(FrmPrincipal.class.getResource("/com/images/appicon2.png")));
 		setTitle("Gerenciador de Faculdade");
@@ -318,6 +307,7 @@ public class FrmPrincipal extends JFrame {
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
+				//TODO Evento Clicar no registro da tabela de alunos
 				int linha = table.getSelectedRow();
 				
 				matricula = Integer.parseInt(modelo.getValueAt(linha, 0).toString());				
@@ -589,5 +579,20 @@ public class FrmPrincipal extends JFrame {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-	}	
+	}
+	
+	private void IniciarSistema() {
+		// TODO Iniciar Sistema
+		if(!ManipulaDados.Conectar()){
+			InOut.OutMessage("Infelizmente não foi possivel se conectar com o Servidor."
+					+ "\nPor favor tente mais tarde", "ERROR", 0);
+			System.exit(0);
+		}else{
+			ManipulaDados.Desconectar();
+			//checar se tem dado
+			ManipulaDados.LerBanco();				//Inserir os alunos do banco do programa
+			PreencherTabela();						//Atualizar tabela com os alunos
+			ManipulaDados.CadastrarDisciplinas();	//Inserir as disciplinas 
+		}
+	}
 }
