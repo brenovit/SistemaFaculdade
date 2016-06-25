@@ -6,21 +6,23 @@ public class Disciplina {
 	private Double nota = 0.0;
 	private Integer codigo;
 	
-	private static int geradorCodigo = 0;
-	
 	public Disciplina(){
-		this.codigo = 0;
-	}
-	
-	public Disciplina(String nome){
-		geradorCodigo++;
-		this.nome = nome;
-		this.codigo = geradorCodigo;
 	}
 	
 	public Disciplina(String nome, Integer codigo){
 		this.nome = nome;
 		this.codigo = codigo;
+		this.nota = 0.0;
+	}
+	
+	public Disciplina(String nome, Integer codigo, Double nota){
+		this.nome = nome;
+		this.codigo = codigo;
+		this.nota = nota;
+	}
+	
+	public Disciplina(String nome){
+		this.nome = nome;
 	}
 	
 	public String getNome() {
@@ -54,14 +56,6 @@ public class Disciplina {
 	
 	public void setCodigo(Integer codigo){
 		this.codigo = codigo;
-	}
-	
-	public static void zerarGerador(){
-		geradorCodigo = 0;
-	}
-	
-	public static void setGerador(int valor){
-		geradorCodigo = valor;
 	}
 	
 	@Override

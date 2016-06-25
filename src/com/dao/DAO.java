@@ -7,5 +7,5 @@ public interface DAO {
 	public void Update (Object o);
 	public boolean Delete (Object o);	
 	public String Show ();
-	public void FeedSystem();
+	public void SyncSystem();
 }

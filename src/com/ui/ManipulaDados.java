@@ -2,8 +2,8 @@ package com.ui;
 
 import java.util.List;
 
+import com.conexao.Banco;
 import com.dao.AlunoDAO;
-import com.dao.Banco;
 import com.dao.DisciplinaDAO;
 import com.persistencia.SaveLoadFile;
 import com.recursos.InOut;
@@ -23,10 +23,12 @@ public class ManipulaDados{
 	
 	protected static void AtualizarAluno(Aluno aluno){
 		dataAluno.Update(aluno);
+		dataAluno.UpdateBanco(aluno);
 	}
 	
 	protected static void RemoverAluno(Aluno aluno){
 		dataAluno.Delete(aluno);
+		dataAluno.DeleteBanco(aluno);
 	}
 	
 	protected static boolean ValidaPesquisa(String dadoPesquisa){
@@ -44,29 +46,24 @@ public class ManipulaDados{
 	}
 	
 	protected static boolean AdicionarMateria(Aluno aluno, Disciplina disc){		
-		if(dataAluno.CadastrarGrade(aluno, disc))			
+		if(dataAluno.CadastrarGrade(aluno, disc) && dataAluno.CadastrarGradeBanco(aluno, disc))
 			return true;
 		return false;		
 	}
 	
 	protected static boolean RemoverMateria(Aluno aluno, Disciplina disc){
-		if(dataAluno.RemoverGrade(aluno, disc))			
+		if(dataAluno.RemoverGrade(aluno, disc) && dataAluno.RemoverGradeBanco(aluno, disc))			
 			return true;
 		return false;		
 	}
 	
-	protected static List<Disciplina> DisciplinasCadastradas(Aluno aluno){			//melhorar
-		List<Disciplina> listaDisciplina = null;
-		
-		if(dataAluno.Read(aluno, true) != -1){
-			listaDisciplina = aluno.getMaterias();
-		}	
-		
-		return listaDisciplina;
+	protected static List<Disciplina> DisciplinasCadastradas(Aluno aluno){
+		System.out.println(dataAluno.ShowDisciplinasMatriculadas(aluno));
+		return dataAluno.getDisciplinas(aluno);
 	}
 		
 	protected static boolean EditarNota(Aluno aluno, Disciplina disc, Double nota){		
-		if(dataAluno.AddNota(aluno, disc, nota))
+		if(dataAluno.AddNota(aluno, disc, nota) && dataAluno.AddNotaBanco(aluno, disc, nota))
 			return true;
 		return false;
 	}
@@ -153,7 +150,7 @@ public class ManipulaDados{
 	}
 	
 	protected static void LerBanco(){
-		dataDisciplina.FeedSystem();
-		dataAluno.FeedSystem();
+		dataDisciplina.SyncSystem();
+		dataAluno.SyncSystem();
 	}
 }

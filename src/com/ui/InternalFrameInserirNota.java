@@ -18,6 +18,7 @@ import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 
+import com.recursos.GradeAlunoTable;
 import com.recursos.InOut;
 import com.vo.Aluno;
 import com.vo.Disciplina;
@@ -41,7 +42,7 @@ public class InternalFrameInserirNota extends JInternalFrame {
 	
 	protected JLabel		lblStatus;
 	private static JTable table;
-	private static DefaultTableModel modelo;
+	private static GradeAlunoTable modelo;
 	private JLabel lblTabela;
 	
 	/**
@@ -71,6 +72,8 @@ public class InternalFrameInserirNota extends JInternalFrame {
 		setIconifiable(true);
 		setBounds(100, 100, 370, 470);
 		getContentPane().setLayout(new BorderLayout(0, 0));
+		
+		modelo = new GradeAlunoTable();
 		
 		JPanel statusBar = new JPanel();
 		statusBar.setBackground(SystemColor.controlHighlight);
@@ -129,24 +132,21 @@ public class InternalFrameInserirNota extends JInternalFrame {
 				//TODO Botão Confirmar				
 				int linha  = table.getSelectedRow();
 				if(linha == -1)
-					return;			
+					return;		
+				
+				Disciplina disc = modelo.getValue(linha);
 				
 				Double nota = Double.parseDouble(txtNota.getText());
 				
 				if(nota > 10){
-					InOut.OutMessage("A nota maxima possivel é 10", "Atenção", 0);
+					InOut.OutMessage("A nota maxima possivel é 10", "ATENÇÃO", 0);
 					nota = 10.0;
 				}
-				
+										
 				Integer matricula = Integer.parseInt(txtMatricula.getText());
-				Integer codigo = (Integer) table.getValueAt(linha, 0);
 				
-				Aluno aluno = new Aluno();
-				Disciplina disc = new Disciplina();
-				
+				Aluno aluno = new Aluno();				
 				aluno.setMatricula(matricula);
-				disc.setCodigo(codigo);				
-				disc.setNota(nota);
 				
 				if(ManipulaDados.EditarNota(aluno, disc, nota)){					
 					PreencherTabela(aluno);
@@ -281,38 +281,21 @@ public class InternalFrameInserirNota extends JInternalFrame {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				//TODO Evento > Click > Tabela
-				int linha  = table.getSelectedRow();				
-				Disciplina disc = new Disciplina();				
-				String discNome = table.getValueAt(linha, 1).toString();				
+				int linha  = table.getSelectedRow();	
+				
+				Disciplina disc = modelo.getValue(linha);
+				
+				/*String discNome = table.getValueAt(linha, 1).toString();				
 				Double nota = Double.parseDouble(table.getValueAt(linha, 2).toString());
 				
 				disc.setNome(discNome);
-				disc.setNota(nota);
+				disc.setNota(nota);*/
 				
 				MudaCamposDisciplina(disc);
 			}
 		});
 		scrollPane.setViewportView(table);
-		table.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"C\u00F3digo", "Disciplina", "Nota", "Aprovado"
-			}
-		) {
-			Class[] columnTypes = new Class[] {
-				Integer.class, String.class, Double.class, Object.class
-			};
-			public Class getColumnClass(int columnIndex) {
-				return columnTypes[columnIndex];
-			}
-			boolean[] columnEditables = new boolean[] {
-				false, false, false, false
-			};
-			public boolean isCellEditable(int row, int column) {
-				return columnEditables[column];
-			}
-		});
+		table.setModel(modelo);
 		table.getColumnModel().getColumn(0).setResizable(false);
 		table.getColumnModel().getColumn(0).setPreferredWidth(50);
 		table.getColumnModel().getColumn(1).setResizable(false);
@@ -362,22 +345,8 @@ public class InternalFrameInserirNota extends JInternalFrame {
 		//TODO PreencherTabela
 		List<Disciplina> listaDisciplina = ManipulaDados.DisciplinasCadastradas(aluno);
 		try{
-			modelo = (DefaultTableModel) table.getModel();
-			
-			if(modelo.getRowCount() > 0)
-				modelo.setRowCount(0);
-			if(listaDisciplina.size() <= 0)
-				return;
-						
-			for(Disciplina disc : listaDisciplina){
-				Object obj[] = {
-						disc.getCodigo(),
-						disc.getNome(),
-						disc.getNota(),
-						disc.getAprovado()
-				};
-				modelo.addRow(obj);
-			}			
+			modelo.removeAll();
+			modelo.setValue(listaDisciplina);			
 		}catch(Exception e){
 			e.printStackTrace();
 		}		

@@ -8,7 +8,7 @@ public class Aluno {
 	private Integer matricula;
 	private String cpf;
 	
-	private static int geradorMatricula = 0;
+	//private static int geradorMatricula = 0;
 	
 	private List<Disciplina> grade;
 	
@@ -16,15 +16,13 @@ public class Aluno {
 		grade = new ArrayList<Disciplina>();
 		matricula = 0;
 	}
-	
 	public Aluno(String nome, String cpf){
 		grade = new ArrayList<Disciplina>();
 		this.nome = nome;
-		this.matricula = ++geradorMatricula;
 		this.cpf = cpf;
 	}
 	
-	public Aluno(String nome, int matricula, String cpf){
+	public Aluno(int matricula, String nome, String cpf){
 		grade = new ArrayList<Disciplina>();
 		this.nome = nome;
 		this.matricula = matricula;
@@ -67,19 +65,19 @@ public class Aluno {
 		this.grade = materias;
 	}
 	
-	public static void zerarGerador(){
+	public void removeDisciplina(int posicao){
+		grade.remove(posicao);
+	}
+	
+	/*public static void zerarGerador(){
 		geradorMatricula = 0;
 	}
 	
 	public static void setGerador(int matricula){
 		geradorMatricula = matricula;
-	}
-	
-	public void removeDisciplina(int posicao){
-		grade.remove(posicao);
-	}
+	}	
 	
 	public static int getGerador(){
 		return geradorMatricula;
-	}
+	}*/
 }

@@ -18,7 +18,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JTable;
 
-import com.recursos.GradeAlunoTable;
+import com.recursos.DisciplinasTable;
 import com.recursos.InOut;
 import com.vo.Aluno;
 import com.vo.Disciplina;
@@ -41,13 +41,10 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 	private static JTable table;
 	private static JList<Disciplina> list;
 	
-	private static GradeAlunoTable modeloT;
+	private static DisciplinasTable modeloT;
 	private static DefaultListModel<Disciplina> modeloL = new DefaultListModel<Disciplina>();
 	
-	private		Integer	codigo;
 	private		int		pos = -1;
-	private		String	materia;
-	private		Integer	matricula;
 	private		String	pesquisa;
 	
 	/**
@@ -78,7 +75,7 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 		setBounds(100, 100, 475, 430);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
-		modeloT = new GradeAlunoTable();
+		modeloT = new DisciplinasTable();
 		
 		JPanel panel_1 = new JPanel();
 		getContentPane().add(panel_1, BorderLayout.CENTER);
@@ -193,8 +190,12 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				int linha = table.getSelectedRow();
-				materia = modeloT.getValueAt(linha, 1).toString();
-				txtMateria.setText(materia);
+				
+				Integer codigo = (Integer) modeloT.getValueAt(linha, 0);									
+				String nome = modeloT.getValueAt(linha, 1).toString();
+				
+				Disciplina disc = new Disciplina(nome, codigo);
+				txtMateria.setText(disc.getNome());
 			}
 		});
 		scrollPane.setViewportView(table);
@@ -228,13 +229,13 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 					if(linha == -1)
 						return;
 					
-					matricula = Integer.parseInt(txtMatricula.getText());
-					codigo = Integer.parseInt(modeloT.getValueAt(linha, 0).toString());									
+					Integer matricula = Integer.parseInt(txtMatricula.getText());
+					Integer codigo = (Integer) modeloT.getValueAt(linha, 0);									
+					String materia = modeloT.getValueAt(linha, 1).toString();
 					
-					Disciplina disc = new Disciplina();
+					Disciplina disc = new Disciplina(materia, codigo);
 					Aluno aluno = new Aluno();
 					
-					disc.setCodigo(codigo);
 					aluno.setMatricula(matricula);
 					
 					if(ManipulaDados.AdicionarMateria(aluno, disc)){
@@ -265,8 +266,8 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 					return;
 				}
 				
-				matricula = Integer.parseInt(txtMatricula.getText());
-				codigo = modeloL.getElementAt(pos).getCodigo();
+				Integer matricula = Integer.parseInt(txtMatricula.getText());
+				Integer codigo = modeloL.getElementAt(pos).getCodigo();
 				pos = -1;
 				
 				Disciplina disc = new Disciplina();
@@ -299,14 +300,13 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 	protected static void AttLista(Aluno aluno){
 		//TODO	Atualiza a lista de Disciplinas cadastradas no aluno		
 		List<Disciplina> listaDisciplina = ManipulaDados.DisciplinasCadastradas(aluno);
-		
 		modeloL.clear();
 
 		if(listaDisciplina.size() == 0)
 			return;
 		
 		for(Disciplina disc : listaDisciplina){
-			modeloL.addElement(disc);
+			((DefaultListModel<Disciplina>)list.getModel()).addElement(disc);
 		}		
 	}
 	

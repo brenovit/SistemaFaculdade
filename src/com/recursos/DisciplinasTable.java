@@ -9,17 +9,15 @@ import com.vo.Aluno;
 import com.vo.Disciplina;
 
 @SuppressWarnings("serial")
-public class GradeAlunoTable extends AbstractTableModel{
+public class DisciplinasTable extends AbstractTableModel{
 	//constantes para indetificar as colunas
 	private final int CODIGO = 0;
 	private final int NOME = 1;
-	private final int NOTA = 2;
-	private final int APROVADO = 3;
 	
-	private String[] columns = {"Código", "Nome", "Nota","Aprovado"};
+	private String[] columns = {"Código", "Nome"};
 	private List<Disciplina> dados;
 	
-	public GradeAlunoTable(){
+	public DisciplinasTable(){
 		dados = new ArrayList<Disciplina>();
 	}
 	
@@ -38,38 +36,30 @@ public class GradeAlunoTable extends AbstractTableModel{
 		return dados.size();
 	}
 	
-	@Override
-	public boolean isCellEditable(int row, int column){
-		return false;
-	}
 	
 	@Override
 	public Object getValueAt(int row, int column) {					//return a value in a row
 		// TODO Auto-generated method stub
 		switch(column){
-			case CODIGO: 	return dados.get(row).getCodigo();
-			case NOME: 		return dados.get(row).getNome();
-			case NOTA: 		return dados.get(row).getNota();
-			case APROVADO: 	return dados.get(row).getAprovado();
+			case CODIGO: 			return dados.get(row).getCodigo();
+			case NOME: 				return dados.get(row).getNome();
 			default:		throw new IndexOutOfBoundsException("Invalid Column");
 		}
 	}
-	/**
-	 * Só a coluna 2 - NOTA será editada.
-	 * Insira um valor Double.
-	 */
+	
 	@Override
 	public void setValueAt(Object value, int row, int column){		//set 
-			if(value == null)	return;
-			dados.get(2).setNota((Double)value);
+		if(value == null)	return;
+		switch (column) {
+			case NOME: dados.get(row).setNome((String)value);break;
+			default:		throw new IndexOutOfBoundsException("Invalid Column");
+		}
 	}
 	
 	public Class<?> getColumnClass(int column) {
 		switch(column){
-			case CODIGO: 	return int.class;
 			case NOME: 		return String.class;
-			case APROVADO: 	return Boolean.class;
-			case NOTA:		return Double.class;
+			case CODIGO: 	return Integer.class;
 			default:		throw new IndexOutOfBoundsException("Invalid Column");
 		}
 	}

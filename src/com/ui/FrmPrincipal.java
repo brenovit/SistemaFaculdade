@@ -62,9 +62,6 @@ public class FrmPrincipal extends JFrame {
 	private		static		JTable		table;	
 	private 	static		AlunosTable modelo;
 
-	private Integer matricula;
-	private String nome;
-	private String CPF;
 	private boolean primeiraVez = true;
 	
 	private InternalFrameCadastroAluno 	frmCadAluno = new InternalFrameCadastroAluno();
@@ -110,11 +107,12 @@ public class FrmPrincipal extends JFrame {
 	 * Create the frame.
 	 */
 	public FrmPrincipal() {
+
 		setResizable(false);
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				SalvarTabela();
+				//SalvarTabela();
 				ManipulaDados.Desconectar();
 			}
 			@Override
@@ -122,6 +120,7 @@ public class FrmPrincipal extends JFrame {
 				IniciarSistema();
 			}			
 		});
+				
 		setIconImage(Toolkit.getDefaultToolkit().getImage(FrmPrincipal.class.getResource("/com/images/appicon2.png")));
 		setTitle("Gerenciador de Faculdade");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -310,11 +309,11 @@ public class FrmPrincipal extends JFrame {
 				//TODO Evento Clicar no registro da tabela de alunos
 				int linha = table.getSelectedRow();
 				
-				matricula = Integer.parseInt(modelo.getValueAt(linha, 0).toString());				
-				nome = modelo.getValueAt(linha, 1).toString();
-				CPF = modelo.getValueAt(linha, 2).toString();
+				Integer matricula = Integer.parseInt(modelo.getValueAt(linha, 0).toString());				
+				String nome = modelo.getValueAt(linha, 1).toString();
+				String CPF = modelo.getValueAt(linha, 2).toString();
 		
-				Aluno aluno = new Aluno(nome,matricula,CPF);
+				Aluno aluno = new Aluno(matricula, nome, CPF);
 				
 				ManipulaDados.MudaCampos(aluno);
 			}
@@ -494,7 +493,7 @@ public class FrmPrincipal extends JFrame {
     	setTitle("Gerenciador de Faculdade");
     }    
     private void SalvarTabela(){
-    	if(modelo.getRowCount() > 0){
+    	/*if(modelo.getRowCount() > 0){
     		int op = InOut.ConfirmDialog("Deseja salvar a tabela atual?", "Salvar");
     		if(op == 0){//sim
     			SalvarArquivo();
@@ -503,7 +502,7 @@ public class FrmPrincipal extends JFrame {
     		}else{//cancelou
     			return;
     		}
-    	}
+    	}*/
     }
     private void VisualizarArquivo(){
     	try {
@@ -574,8 +573,7 @@ public class FrmPrincipal extends JFrame {
 	
 	protected static void PreencherTabela(){
 		try{			
-			modelo.setValue(ManipulaDados.getListAluno());
-			
+			modelo.setValue(ManipulaDados.getListAluno());			
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -585,7 +583,7 @@ public class FrmPrincipal extends JFrame {
 		// TODO Iniciar Sistema
 		if(!ManipulaDados.Conectar()){
 			InOut.OutMessage("Infelizmente não foi possivel se conectar com o Servidor."
-					+ "\nPor favor tente mais tarde", "ERROR", 0);
+					+ "\nPor favor tente novamente mais tarde", "ERRO", 0);
 			System.exit(0);
 		}else{
 			ManipulaDados.Desconectar();

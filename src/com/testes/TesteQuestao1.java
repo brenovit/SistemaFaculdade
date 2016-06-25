@@ -16,7 +16,7 @@ public class TesteQuestao1 {
 		AlunoDAO lista = new AlunoDAO();
 		
 		//criar os aluno
-		Aluno al1 = new Aluno("Breno", "01234567890");
+		Aluno al1 = new Aluno("Breno", "07049603546");
 		Aluno al2 = new Aluno("Mauricio", "09876543210");
 		Aluno al3 = new Aluno("Fabio", "1238569753");
 		
@@ -39,13 +39,13 @@ public class TesteQuestao1 {
 		//lista.Delete(al2);
 		
 		//mostrar todos os alunos cadastrados
-		lista.Show();		
+		//lista.Show();		
 		
 		//procurar aluno na lista
-		lista.Read(al3);
+		//lista.Read(al3);
 		
 		//checar existencia do aluno na lista
-		if(lista.Read(al1) == -1 ){
+		/*if(lista.Read(al1) == -1 ){
 			InOut.OutMessage("Aluno não cadastrado");
 		}else{
 			InOut.OutMessage("Aluno Cadastrado\nNome: " + al1.getNome());

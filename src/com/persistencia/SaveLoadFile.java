@@ -43,7 +43,6 @@ public class SaveLoadFile {
 			
 			while((linha = br.readLine())!= null){
 				Aluno aluno = gson.fromJson(linha, Aluno.class);
-				Aluno.setGerador(aluno.getMatricula());
 				listaAluno.Create(aluno);
 			}
 			fr.close();

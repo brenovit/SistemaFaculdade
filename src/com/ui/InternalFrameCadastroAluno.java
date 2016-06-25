@@ -60,8 +60,6 @@ public class InternalFrameCadastroAluno extends JInternalFrame {
 	private 	JLabel		lblPesquisar;
 	
 	private static Mode mode;
-
-	private Integer matricula;
 	
 	/**
 	 * Launch the application.
@@ -110,7 +108,7 @@ public class InternalFrameCadastroAluno extends JInternalFrame {
 				AtivarBotoes(true);
 				LimparCampos();
 				txtNome.requestFocus();
-				txtMatricula.setText(""+(Aluno.getGerador()+1));
+				txtMatricula.setText("");
 				lblStatus.setText("Cadastrando Aluno");
 			}
 		});
@@ -145,7 +143,7 @@ public class InternalFrameCadastroAluno extends JInternalFrame {
 				mode = Mode.REMOVE;
 				if(CamposVazios("Excluir"))
 					return;
-				matricula = Integer.parseInt(txtMatricula.getText());
+				Integer matricula = Integer.parseInt(txtMatricula.getText());
 				AtivarBotoes(true);
 				FrmPrincipal.setTableEnable(false);				
 				InOut.OutMessage("Para excluir o Aluno: " + txtNome.getText() + "\n,clique no Botão Confirmar");
@@ -302,7 +300,7 @@ public class InternalFrameCadastroAluno extends JInternalFrame {
 	
 	private void Confirmar(){
 		//TODO Método > Confirmar
-		Aluno aluno;
+		Aluno aluno;		
 		if(CamposVazios())
 			return;
 		switch(mode){
@@ -311,16 +309,17 @@ public class InternalFrameCadastroAluno extends JInternalFrame {
 			ManipulaDados.CadastrarAluno(aluno);					
 			break;
 		case UPDATE:						///modo de alteração
-			aluno = new Aluno(txtNome.getText(), Integer.parseInt(txtMatricula.getText()),txtCPF.getText());
+			aluno = new Aluno(Integer.parseInt(txtMatricula.getText()), txtNome.getText(), txtCPF.getText());
 			ManipulaDados.AtualizarAluno(aluno);
 			break;
 		case REMOVE:						///modo de exclusão
 			aluno = new Aluno();
+			Integer matricula = Integer.parseInt(txtMatricula.getText());
 			aluno.setMatricula(matricula);
 			ManipulaDados.RemoverAluno(aluno);
 			break;
 		}
-		txtMatricula.setText((Aluno.getGerador()+1)+"");
+		txtMatricula.setText("");
 		FrmPrincipal.setTableEnable(true);
 		FrmPrincipal.PreencherTabela();
 		AtivarBotoes(false);

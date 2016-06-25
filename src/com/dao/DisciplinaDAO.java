@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.conexao.Banco;
 import com.recursos.InOut;
 import com.vo.Aluno;
 import com.vo.Disciplina;
@@ -40,17 +41,16 @@ public class DisciplinaDAO implements DAO{
 		
 	}
 	
-	public void FeedSystem(){
+	public void SyncSystem(){
 		try {
 			String sql = "SELECT id,nome FROM disciplinas";
 			pst = Banco.Connect().prepareStatement(sql);
-			ResultSet rs = pst.executeQuery(sql);
+			ResultSet rs = pst.executeQuery();
 			while(rs.next()){
-				Integer codigo = Integer.parseInt(rs.getString(1));
+				Integer codigo = rs.getInt(1);
 				String nome = rs.getString(2);				
 				
-				Disciplina disc = new Disciplina(nome,codigo);				
-				Disciplina.setGerador(codigo);
+				Disciplina disc = new Disciplina(nome,codigo);
 				
 				listaDisc.add(disc);
 			}
