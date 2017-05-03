@@ -45,6 +45,7 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 	private static DefaultListModel<Disciplina> modeloL = new DefaultListModel<Disciplina>();
 	
 	private		int		pos = -1;
+	private		Disciplina	disc = null;
 	private		String	pesquisa;
 	
 	/**
@@ -91,7 +92,8 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 		list.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				pos = list.getSelectedIndex();				
+				//pos = list.getSelectedIndex();
+				disc = list.getSelectedValue();
 			}
 		});
 		list.setVisibleRowCount(20);
@@ -261,21 +263,13 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 				if(CamposVazios("Remover uma máteria de"))
 					return;
 				
-				if(pos == -1){
-					InOut.OutMessage("Para remover uma Materia, primeiro selecione-a na lista de Disciplinas Cadastradas");
+				if(disc.equals(null)){
+					InOut.OutMessage("Para remover uma Matéria, primeiro selecione-a na lista de Disciplinas Cadastradas");
 					return;
 				}
-				
-				Integer matricula = Integer.parseInt(txtMatricula.getText());
-				Integer codigo = modeloL.getElementAt(pos).getCodigo();
-				pos = -1;
-				
-				Disciplina disc = new Disciplina();
+				Integer matricula = Integer.parseInt(txtMatricula.getText());			
 				Aluno aluno = new Aluno();
-				
-				disc.setCodigo(codigo);
-				aluno.setMatricula(matricula);
-								
+				aluno.setMatricula(matricula);			
 				ManipulaDados.RemoverMateria(aluno, disc);
 				AttLista(aluno);				
 			}
@@ -297,6 +291,14 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 		PreencherTabela();
 	}
 	
+	protected static void PreencherTabela(){
+		try{
+			modeloT.setValue(ManipulaDados.getListDisciplina());
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
 	protected static void AttLista(Aluno aluno){
 		//TODO	Atualiza a lista de Disciplinas cadastradas no aluno		
 		List<Disciplina> listaDisciplina = ManipulaDados.DisciplinasCadastradas(aluno);
@@ -308,19 +310,11 @@ public class InternalFrameCadastrarGradeAluno extends JInternalFrame {
 		for(Disciplina disc : listaDisciplina){
 			((DefaultListModel<Disciplina>)list.getModel()).addElement(disc);
 		}		
-	}
+	}	
 	
-	protected static void PreencherTabela(){
-		try{
-			modeloT.setValue(ManipulaDados.getListDisciplina());
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
-	
-	protected static void MudarCampos(Aluno dados){
-		txtMatricula.setText(dados.getMatricula().toString());
-		txtNome.setText(dados.getNome());
+	protected static void MudarCampos(Aluno aluno){
+		txtMatricula.setText(aluno.getMatricula().toString());
+		txtNome.setText(aluno.getNome());
 	}
 	
 	private boolean CamposVazios(String msg){

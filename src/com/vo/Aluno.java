@@ -8,13 +8,11 @@ public class Aluno {
 	private Integer matricula;
 	private String cpf;
 	
-	//private static int geradorMatricula = 0;
-	
 	private List<Disciplina> grade;
 	
 	public Aluno(){
 		grade = new ArrayList<Disciplina>();
-		matricula = 0;
+		matricula = -1;
 	}
 	public Aluno(String nome, String cpf){
 		grade = new ArrayList<Disciplina>();
@@ -52,11 +50,7 @@ public class Aluno {
 	public void setCPF(String cpf) {
 		this.cpf = cpf;
 	}
-	
-	public void addMateria(Disciplina materia){
-		this.grade.add(materia);
-	}
-	
+
 	public List<Disciplina> getMaterias(){		
 		return this.grade;
 	}
@@ -64,20 +58,8 @@ public class Aluno {
 	public void setMaterias(List<Disciplina> materias){
 		this.grade = materias;
 	}
-	
-	public void removeDisciplina(int posicao){
-		grade.remove(posicao);
+
+	public String toString(){
+		return this.matricula + "." + this.nome + "." + this.cpf;
 	}
-	
-	/*public static void zerarGerador(){
-		geradorMatricula = 0;
-	}
-	
-	public static void setGerador(int matricula){
-		geradorMatricula = matricula;
-	}	
-	
-	public static int getGerador(){
-		return geradorMatricula;
-	}*/
 }

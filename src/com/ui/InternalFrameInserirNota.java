@@ -1,3 +1,4 @@
+
 package com.ui;
 
 import java.awt.EventQueue;
@@ -285,12 +286,6 @@ public class InternalFrameInserirNota extends JInternalFrame {
 				
 				Disciplina disc = modelo.getValue(linha);
 				
-				/*String discNome = table.getValueAt(linha, 1).toString();				
-				Double nota = Double.parseDouble(table.getValueAt(linha, 2).toString());
-				
-				disc.setNome(discNome);
-				disc.setNota(nota);*/
-				
 				MudaCamposDisciplina(disc);
 			}
 		});
@@ -330,12 +325,14 @@ public class InternalFrameInserirNota extends JInternalFrame {
 		txtDisciplina.setText(disc.getNome());
 		txtNota.setText(disc.getNota().toString());
 	}
+	
 	protected static void MudarCampos(Aluno aluno){
 		//TODO MudaCampos
 		txtNome.setText(aluno.getNome());
 		txtMatricula.setText(aluno.getMatricula().toString());
 		PreencherTabela(aluno);
 	}
+	
 	protected void MudaDisciplina(Disciplina disc){
 		txtDisciplina.setText(disc.getNome());
 		txtNota.setText(disc.getNota().toString());
@@ -345,7 +342,6 @@ public class InternalFrameInserirNota extends JInternalFrame {
 		//TODO PreencherTabela
 		List<Disciplina> listaDisciplina = ManipulaDados.DisciplinasCadastradas(aluno);
 		try{
-			modelo.removeAll();
 			modelo.setValue(listaDisciplina);			
 		}catch(Exception e){
 			e.printStackTrace();

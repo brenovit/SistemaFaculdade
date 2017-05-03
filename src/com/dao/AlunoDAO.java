@@ -13,10 +13,8 @@ import com.vo.Disciplina;
 
 public class AlunoDAO implements DAO {
 	private List<Aluno> listaAluno;
-	private List<Disciplina> listaDisciplina;
-	
+	private List<Disciplina> listaDisciplina;	
 	private String msg = "";	
-	
 	private PreparedStatement pst = null;
 	
 	public AlunoDAO(){
@@ -41,7 +39,7 @@ public class AlunoDAO implements DAO {
 	}
 	
 	@Override	
-	public void Create(Object o) {
+	public boolean Create(Object o) {
 		Aluno object = (Aluno) o;
 		try {
 			String sql = "INSERT INTO alunos (nome,cpf) VALUES (?,?)";
@@ -51,8 +49,6 @@ public class AlunoDAO implements DAO {
 			pst.execute();
 			Banco.Disconnect();
 			
-			System.out.println(object.getCPF());
-			
 			String SQL = "SELECT alunos.id FROM faculdade.alunos WHERE cpf = ?";
 			pst = Banco.Connect().prepareStatement(SQL);
 			pst.setString(1, object.getCPF());
@@ -61,11 +57,14 @@ public class AlunoDAO implements DAO {
 				object.setMatricula(rs.getInt(1));
 			
 			listaAluno.add(object);
+			Banco.Disconnect();		
+			return true;
 		} catch(SQLException e) {
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERRO - CADASTRAR ALUNO", 1);
 		} finally {
-			Banco.Disconnect();
-		}		
+			Banco.Disconnect();			
+		}
+		return false;
 	}
 	
 	@Override
@@ -84,28 +83,30 @@ public class AlunoDAO implements DAO {
         }
         if((posAux < listaAluno.size()) && 
         		(listaAluno.get(posAux).getMatricula().equals(((Aluno)o).getMatricula())) == true){
-        	if(alterar){
+        	/*if(alterar){
         		((Aluno)o).setCPF(listaAluno.get(posAux).getCPF());
         		((Aluno)o).setNome(listaAluno.get(posAux).getNome());
         		((Aluno)o).setMaterias(listaAluno.get(posAux).getMaterias());
         		((Aluno)o).setMatricula(listaAluno.get(posAux).getMatricula());
-        	}
+        	}*/
             posicao = posAux;
         }
         return posicao;
 	}
 	
 	@Override
-	public void Update(Object o) {
+	public boolean Update(Object o) {
 		Aluno object = (Aluno) o;
 		int posicao = Read(object,false);
         if(posicao != -1) {
         	listaAluno.get(posicao).setNome(object.getNome());
         	listaAluno.get(posicao).setCPF(object.getCPF());
+        	return true;
         }
+        return false;
 	}
 	
-	public void UpdateBanco(Object o) {
+	public boolean UpdateBanco(Object o) {
 		Aluno object = (Aluno) o;
 		try {			
 			String sql = "UPDATE alunos SET nome = ?, cpf = ? WHERE id = ?";
@@ -114,18 +115,21 @@ public class AlunoDAO implements DAO {
 			pst.setString(2, object.getCPF());
 			pst.setString(3, object.getMatricula().toString());
 			pst.executeUpdate();
+			Banco.Disconnect();
+			return true;
 		} catch(SQLException e) {
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERRO - UPDATE", 1);
 		} finally {
 			Banco.Disconnect();
 		}	     
+		return false;
 	}
 	
 	@Override
 	public boolean Delete(Object o){
-		int posicao = Read(o,false);
-	    if(posicao != -1) {
-	    	listaAluno.remove(posicao);
+		int pos = Read(o,false);
+	    if(pos != -1) {
+	    	listaAluno.remove(pos);
 	    	return true;
 	    }
 	    return false;
@@ -188,7 +192,7 @@ public class AlunoDAO implements DAO {
 	public boolean CadastrarGrade(Aluno aluno, Disciplina disc){
 		int pos = Read(aluno);
 		if(pos != -1){
-			listaAluno.get(pos).addMateria(disc);					//inconsistência
+			listaAluno.get(pos).getMaterias().add(disc);					//inconsistência
 			return true;
 		}
 		return false;
@@ -258,8 +262,8 @@ public class AlunoDAO implements DAO {
 	public boolean RemoverGrade(Aluno aluno, Disciplina disc){
 		int pos = TemMateria(aluno, disc);
 		if(pos != -1){
-			listaAluno.get(pos).removeDisciplina(pos);
-			Banco.Disconnect();
+			System.out.println(disc.toString());
+			System.out.println("Lista: " + listaAluno.get(pos).getMaterias().get(pos).toString());
 			return true;
 		}
 		return false;
@@ -271,9 +275,7 @@ public class AlunoDAO implements DAO {
 			pst = Banco.Connect().prepareStatement(sql);
 			pst.setInt(1, aluno.getMatricula());
 			pst.setInt(2, disc.getCodigo());
-			pst.executeUpdate();
-			
-			
+			pst.executeUpdate();			
 		} catch (SQLException e) {
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERRO - DELETE", 1);
 		} finally {
@@ -313,9 +315,7 @@ public class AlunoDAO implements DAO {
 	public void SyncSystem(){	//Syncronizar o sistema com o banco
 		try {
 			String sql = "SELECT id, nome, cpf FROM alunos";
-			//pst = Banco.Connect().prepareStatement(sql);
-			//ResultSet rs = pst.executeQuery(sql);
-			ResultSet rs = (pst = Banco.Connect().prepareStatement(sql)).executeQuery(sql);
+			ResultSet rs = (pst = Banco.Connect().prepareStatement(sql)).executeQuery();
 			while(rs.next()){
 				Integer matricula = Integer.parseInt(rs.getString(1));
 				String  nome = rs.getString(2);
@@ -323,27 +323,25 @@ public class AlunoDAO implements DAO {
 				
 				Aluno aluno = new Aluno(matricula, nome, cpf);
 				listaAluno.add(aluno);
+				System.out.println(aluno.toString());
 			}			
 			Banco.Disconnect();
 			
-			sql = "SELECT id_aluno, id_disciplina, nota FROM grade_aluno";
-			pst = Banco.Connect().prepareStatement(sql);
-			rs = (pst = Banco.Connect().prepareStatement(sql)).executeQuery(sql);
+			sql = "SELECT id_aluno, id_disciplina, disciplinas.nome, nota FROM grade_aluno INNER JOIN disciplinas ON id_disciplina = disciplinas.id";
+			rs = (pst = Banco.Connect().prepareStatement(sql)).executeQuery();
 			while(rs.next()){
-				Integer matricula = Integer.parseInt(rs.getString(1));
-				Integer codigo = Integer.parseInt(rs.getString(2));
-				Double nota = Double.parseDouble(rs.getString(3));			
+				Integer matricula = rs.getInt(1);
+				Integer codigo = rs.getInt(2);
+				String nome = rs.getString(3);
+				Double nota = rs.getDouble(4);			
 				
 				Aluno aluno = new Aluno();
 				aluno.setMatricula(matricula);
 				
-				Disciplina disc = new Disciplina();
-				disc.setCodigo(codigo);
+				Disciplina disc = new Disciplina(nome, codigo);
 				
 				CadastrarGrade(aluno, disc);
 				AddNota(aluno, disc, nota);
-				
-				listaAluno.add(aluno);
 			}
 		} catch (SQLException e) {
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERRO - SINCRONIZAÇÃO", 1);

@@ -274,8 +274,7 @@ public class FrmPrincipal extends JFrame {
 		JMenuItem menuItem_1 = new JMenuItem("Sobre");
 		menuItem_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//TODO	Menu > Sobre
-				
+				//TODO	Menu > Sobre				
 			}
 		});
 		menuItem_1.setIcon(new ImageIcon(FrmPrincipal.class.getResource("/com/images/info.png")));
@@ -309,12 +308,7 @@ public class FrmPrincipal extends JFrame {
 				//TODO Evento Clicar no registro da tabela de alunos
 				int linha = table.getSelectedRow();
 				
-				Integer matricula = Integer.parseInt(modelo.getValueAt(linha, 0).toString());				
-				String nome = modelo.getValueAt(linha, 1).toString();
-				String CPF = modelo.getValueAt(linha, 2).toString();
-		
-				Aluno aluno = new Aluno(matricula, nome, CPF);
-				
+				Aluno aluno = modelo.getValue(linha);
 				ManipulaDados.MudaCampos(aluno);
 			}
 		});
@@ -515,25 +509,25 @@ public class FrmPrincipal extends JFrame {
 		//TODO Metodo abrir
     	ManipulaDados.LimparLista();
     	showOpenFileDialog();
-		try{
-			if(!arquivo.equals("") && arquivo.endsWith("json")){
+		try {
+			if(!arquivo.equals("") && arquivo.endsWith("json")) {
 				ManipulaDados.Carregar(arquivo);
 				PreencherTabela();
 				setTitle("Gerenciador de Faculdade - "+arquivo);
 			}
-		}catch(Exception e){
+		} catch(Exception e) {
 			e.printStackTrace();
 		}		
    	}    
     private void SalvarArquivo(){
 		//TODO Método Salvar
-    	if(primeiraVez && arquivo.equals("")){
+    	if(primeiraVez && arquivo.equals("")) {
     		showSaveFileDialog();
-    		if(!arquivo.equals("") && arquivo.endsWith("json")){
+    		if(!arquivo.equals("") && arquivo.endsWith("json")) {
 				primeiraVez = false;
 		    	ManipulaDados.Salvar(arquivo);
     		}
-		}else{
+		} else {
 	    	ManipulaDados.Salvar(arquivo);
 		}    	
    	}
@@ -549,7 +543,7 @@ public class FrmPrincipal extends JFrame {
             arquivo = fc.getSelectedFile().getAbsolutePath();
             arquivo = arquivo.replace(".json", "");
             arquivo += ".json";
-        }else{
+        } else {
         	arquivo = "";
         }
     }
@@ -562,7 +556,7 @@ public class FrmPrincipal extends JFrame {
         int result = fc.showSaveDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
         	arquivo = fc.getSelectedFile().getAbsolutePath()+".json";
-        }else{
+        } else {
         	arquivo = "";
         }
     }
@@ -572,9 +566,9 @@ public class FrmPrincipal extends JFrame {
 	}
 	
 	protected static void PreencherTabela(){
-		try{			
+		try {			
 			modelo.setValue(ManipulaDados.getListAluno());			
-		}catch(Exception e){
+		} catch(Exception e){
 			e.printStackTrace();
 		}
 	}
@@ -585,12 +579,12 @@ public class FrmPrincipal extends JFrame {
 			InOut.OutMessage("Infelizmente não foi possivel se conectar com o Servidor."
 					+ "\nPor favor tente novamente mais tarde", "ERRO", 0);
 			System.exit(0);
-		}else{
+		} else {
 			ManipulaDados.Desconectar();
 			//checar se tem dado
-			ManipulaDados.LerBanco();				//Inserir os alunos do banco do programa
-			PreencherTabela();						//Atualizar tabela com os alunos
 			ManipulaDados.CadastrarDisciplinas();	//Inserir as disciplinas 
+			ManipulaDados.LerBanco();				//Inserir os alunos do banco do programa
+			PreencherTabela();						//Atualizar tabela com os alunos			
 		}
 	}
 }

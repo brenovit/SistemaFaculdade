@@ -25,7 +25,7 @@ public class DisciplinaDAO implements DAO{
 	}
 
 	@Override
-	public void Create(Object o) {
+	public boolean Create(Object o) {
 		//TODO Create
 		Disciplina disc = (Disciplina) o;
 		try {
@@ -36,8 +36,11 @@ public class DisciplinaDAO implements DAO{
 			Banco.Disconnect();
 		} catch (Exception e) {
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - INSERT", 1);
+			return false;
 		}
+		
 		listaDisc.add(disc);
+		return true;
 		
 	}
 	
@@ -99,7 +102,7 @@ public class DisciplinaDAO implements DAO{
 	}
 
 	@Override
-	public void Update(Object o) {
+	public boolean Update(Object o) {
 		//TODO Update
 		Disciplina disc = (Disciplina) o;
 		try {
@@ -107,15 +110,18 @@ public class DisciplinaDAO implements DAO{
 			pst = Banco.Connect().prepareStatement(sql);
 			pst.setString(1, disc.getNome());
 			pst.executeUpdate();
-			Banco.Disconnect();
 		} catch (Exception e) {
 			InOut.OutMessage("Erro: \n"+e.getMessage(), "ERROR - INSERT", 1);		
+		} finally{
+			Banco.Disconnect();
 		}
 		
 		int posicao = Read(disc,false);
         if(posicao != -1){
         	listaDisc.get(posicao).setNome(disc.getNome());
+        	return true;
         }
+        return false;
 	}
 
 	@Override

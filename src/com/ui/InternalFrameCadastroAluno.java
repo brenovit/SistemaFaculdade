@@ -146,7 +146,7 @@ public class InternalFrameCadastroAluno extends JInternalFrame {
 				Integer matricula = Integer.parseInt(txtMatricula.getText());
 				AtivarBotoes(true);
 				FrmPrincipal.setTableEnable(false);				
-				InOut.OutMessage("Para excluir o Aluno: " + txtNome.getText() + "\n,clique no Botão Confirmar");
+				InOut.OutMessage("Para excluir o Aluno: " + txtNome.getText() + ",\nClique no botão Confirmar");
 				lblStatus.setText("Excluindo Aluno");	
 			}
 		});
@@ -359,10 +359,10 @@ public class InternalFrameCadastroAluno extends JInternalFrame {
 		txtCPF.setText("");
 	}
 	
-	protected static void MudarCampos(Aluno dados){
-		txtMatricula.setText(dados.getMatricula().toString());
-		txtCPF.setText(dados.getCPF());
-		txtNome.setText(dados.getNome());
+	protected static void MudarCampos(Aluno aluno){
+		txtMatricula.setText(aluno.getMatricula().toString());
+		txtCPF.setText(aluno.getCPF());
+		txtNome.setText(aluno.getNome());
 	}
 	
 	private boolean CamposVazios(String msg){

@@ -21,14 +21,24 @@ public class ManipulaDados{
 		dataAluno.Create(aluno);
 	}
 	
-	protected static void AtualizarAluno(Aluno aluno){
-		dataAluno.Update(aluno);
-		dataAluno.UpdateBanco(aluno);
+	protected static boolean PesquisarAluno(Aluno aluno){
+		if(dataAluno.Read(aluno,false) != -1)
+			return true;
+		return false;
 	}
 	
-	protected static void RemoverAluno(Aluno aluno){
-		dataAluno.Delete(aluno);
-		dataAluno.DeleteBanco(aluno);
+	protected static boolean AtualizarAluno(Aluno aluno){
+		if(dataAluno.Update(aluno) && dataAluno.UpdateBanco(aluno)){
+			return true;
+		}
+		return false;
+	}
+	
+	protected static boolean RemoverAluno(Aluno aluno){
+		if(dataAluno.Delete(aluno) && dataAluno.DeleteBanco(aluno)){
+			return true;
+		}
+		return false;
 	}
 	
 	protected static boolean ValidaPesquisa(String dadoPesquisa){
@@ -38,13 +48,7 @@ public class ManipulaDados{
 		}
 		return false;
 	}
-	
-	protected static boolean PesquisarAluno(Aluno aluno){
-		if(dataAluno.Read(aluno,true) != -1)
-			return true;
-		return false;
-	}
-	
+			
 	protected static boolean AdicionarMateria(Aluno aluno, Disciplina disc){		
 		if(dataAluno.CadastrarGrade(aluno, disc) && dataAluno.CadastrarGradeBanco(aluno, disc))
 			return true;
@@ -52,13 +56,12 @@ public class ManipulaDados{
 	}
 	
 	protected static boolean RemoverMateria(Aluno aluno, Disciplina disc){
-		if(dataAluno.RemoverGrade(aluno, disc) && dataAluno.RemoverGradeBanco(aluno, disc))			
+		if(dataAluno.RemoverGrade(aluno, disc) /*&& dataAluno.RemoverGradeBanco(aluno, disc)*/)			
 			return true;
 		return false;		
 	}
 	
 	protected static List<Disciplina> DisciplinasCadastradas(Aluno aluno){
-		System.out.println(dataAluno.ShowDisciplinasMatriculadas(aluno));
 		return dataAluno.getDisciplinas(aluno);
 	}
 		
@@ -89,16 +92,8 @@ public class ManipulaDados{
 		}
 	}
 	
-	protected static AlunoDAO getAlunoDAO(){
-		return dataAluno;
-	}
-	
 	protected static List<Aluno> getListAluno(){
 		return dataAluno.getLista();
-	}
-	
-	protected static DisciplinaDAO getGradeEscolar(){
-		return dataDisciplina;
 	}
 	
 	protected static List<Disciplina> getListDisciplina(){
@@ -143,10 +138,6 @@ public class ManipulaDados{
 	
 	protected static void Desconectar(){
 		Banco.Disconnect();
-	}
-	
-	protected static boolean isEmpty(){
-		return false;		
 	}
 	
 	protected static void LerBanco(){
